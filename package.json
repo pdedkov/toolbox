@@ -1,0 +1,88 @@
+{
+  "_args": [
+    [
+      "mira-tb@^1.0.1",
+      "/Users/pavel/www/linker"
+    ]
+  ],
+  "_from": "mira-tb@>=1.0.1 <2.0.0",
+  "_id": "mira-tb@1.0.1",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/mira-tb",
+  "_nodeVersion": "5.1.1",
+  "_npmUser": {
+    "email": "pavel.dedkov@gmail.com",
+    "name": "pdedkov"
+  },
+  "_npmVersion": "3.3.12",
+  "_phantomChildren": {},
+  "_requested": {
+    "name": "mira-tb",
+    "raw": "mira-tb@^1.0.1",
+    "rawSpec": "^1.0.1",
+    "scope": null,
+    "spec": ">=1.0.1 <2.0.0",
+    "type": "range"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_shasum": "ac2d6023b19ac6136659b775c871fe523dbd3d25",
+  "_shrinkwrap": null,
+  "_spec": "mira-tb@^1.0.1",
+  "_where": "/Users/pavel/www/linker",
+  "author": {
+    "email": "pavel.dedkov@gmail.com",
+    "name": "Pavel E. Dedkov",
+    "url": "http://dedkov.ru"
+  },
+  "dependencies": {
+    "co-sleep": "0.0.1",
+    "mout": "~0.11.0",
+    "restler": "^3.4.0"
+  },
+  "description": "miralinks toolbox api adapter",
+  "devDependencies": {
+    "babel": "^6.3.13",
+    "babel-cli": "^6.3.17",
+    "babel-register": "^6.3.13",
+    "chai": "^3.4.1",
+    "istanbul": "^0.4.1",
+    "mocha": "^2.3.4",
+    "sinon": "^1.17.2",
+    "sinon-chai": "^2.8.0"
+  },
+  "directories": {},
+  "dist": {
+    "shasum": "ac2d6023b19ac6136659b775c871fe523dbd3d25",
+    "tarball": "http://registry.npmjs.org/mira-tb/-/mira-tb-1.0.1.tgz"
+  },
+  "engine": "node >= 0.12.*",
+  "keywords": [
+    "api",
+    "miralinks",
+    "toolbox"
+  ],
+  "license": "MIT",
+  "main": "lib/index.es6.js",
+  "maintainers": [
+    {
+      "name": "pdedkov",
+      "email": "pavel.dedkov@gmail.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ryg9I/toolbox.git"
+  },
+  "name": "mira-tb",
+  "optionalDependencies": {},
+  "scripts": {
+    "compile": "babel --experimental --optional runtime -d lib/ src/",
+    "prepublish": "npm run compile",
+    "test": "mocha --require test/babelhook --reporter spec --compilers es6.js:babel-register",
+    "test-travis": "istanbul cover _mocha --report lcovonly --hook-run-in-context -- --require test/babelhook --compilers es6.js:babel-register --reporter dot"
+  },
+  "version": "1.0.1"
+}
