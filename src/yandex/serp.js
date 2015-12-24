@@ -1,9 +1,9 @@
 "use strict";
 
 let Base = require('./../base');
-let merge = require('mout/object/merge');
-let status = require('./../status');
 let sleep = require('co-sleep');
+let merge = require('mout/object/merge');
+
 /**
  * Базовый адаптер для доступа к toolbox.mirahost.ru
  *
@@ -27,22 +27,40 @@ function Serp(options) {
 Serp.prototype = Object.create(Base.prototype);
 Serp.prototype.constructor = Serp;
 
-Serp.prototype.get = function* (host) {
-
+/**
+ * Постановка задачи и её обработка
+ * @param {string} host хост
+ * @param {function} action действие
+ * @private
+ */
+Serp.prototype._process = function(host, success, error) {
 	// сначала ставим задачку
-	let id = yield this._request(this._url(this._options.location.set.url), 'POST', {url: host, domain: host});
+	this._request(
+		this._url(this._options.location.set.url),
+		'POST',
+		{url: host, domain: host},
+		function(id) {
+			if (id instanceof Error) {
+				error(id);
+			}
+			this._waitData.call(this, id.id, function(res) {
+				if (res instanceof Error) {
+					error(res);
+				}
+				success(res.Result.pages);
+			});
+		}.bind(this)
+	);
+}
 
-	let res = {status: status.NEW};
-
-	while (res.status != status.COMPLETE) {
-		res = yield this._request(this._url(this._options.location.get.url, {id: id.id}));
-		if (res.status == status.ERROR) {
-			throw new Error(res.message);
-		}
-		// подождём немного
-		yield sleep(this._options.sleep * 1000);
-	}
-	return res.Result.pages;
+/**
+ * Получения результатов
+ * @param {string} host хост, который подлежит обработке
+ * @param {function} callback
+ * @returns {Promise}
+ */
+Serp.prototype.get = function(host, callback) {
+	return this._get(host, callback);
 }
 
 module.exports  = Serp;

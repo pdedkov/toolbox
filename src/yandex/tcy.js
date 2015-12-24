@@ -24,11 +24,26 @@ function Tcy(options) {
 Tcy.prototype = Object.create(Base.prototype);
 Tcy.prototype.constructor = Tcy;
 
-Tcy.prototype.get = function* (host) {
+/**
+ * Постановка задачи и её обработка
+ * @param {string} host хост
+ * @param {function} action действие
+ * @private
+ */
+Tcy.prototype._process = function(host, success, error) {
 	// сначала ставим задачку
-	let tcy = yield this._request(this._url(this._options.location.get.url, {host: host}));
+	this._request(this._url(this._options.location.get.url, {host: host}), 'GET', {},
+		function(res) {
+			if (res instanceof Error) {
+				error(res);
+			}
+			success(res.tcy);
+		}.bind(this)
+	);
+}
 
-	return tcy.tcy;
+Tcy.prototype.get = function(host, callback) {
+	return this._get(host, callback);
 }
 
 module.exports  = Tcy;
