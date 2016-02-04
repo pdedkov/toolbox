@@ -52,7 +52,7 @@ Base.prototype._waitData = function(id, callback) {
 				if (res.status != status.COMPLETE) {
 					setTimeout(this._waitData.bind(this, id, callback), this._options.sleep * 1000);
 				} else {
-					return callback(null, res);
+					return callback(res);
 				}
 			}
 		}.bind(this)
