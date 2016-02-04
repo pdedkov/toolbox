@@ -52,7 +52,7 @@ Base.prototype._waitData = function(id, callback) {
 				if (res.status != status.COMPLETE) {
 					setTimeout(this._waitData.bind(this, id, callback), this._options.sleep * 1000);
 				} else {
-					return callback(res);
+					return callback(null, res);
 				}
 			}
 		}.bind(this)
@@ -69,10 +69,10 @@ Base.prototype._get = function(params, callback) {
 	if (typeof callback == 'function') {
 		return this._process(params,
 			function(res) {
-				callback(res)
+				callback(null, res)
 			},
 			function(err) {
-				throw err;
+				callback(err);
 			}
 		);
 	} else {
