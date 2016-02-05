@@ -32,32 +32,27 @@ function Base(options) {
  *
  * @private
  */
-Base.prototype._process = function() {
+Base.prototype._process = function () {
 	throw new Error('Method not implemented');
-}
+};
 
 /**
  * Ожидаем получения результата
  * @private
  */
-Base.prototype._waitData = function(id, callback) {
-	this._request(
-		this._url(this._options.location.get.url, {id: id}),
-		'GET',
-		{},
-		function(res) {
-			if (res.status == status.ERROR) {
-				return callback(new Error(res.message));
+Base.prototype._waitData = function (id, callback) {
+	this._request(this._url(this._options.location.get.url, { id: id }), 'GET', {}, (function (res) {
+		if (res.status == status.ERROR) {
+			return callback(new Error(res.message));
+		} else {
+			if (res.status != status.COMPLETE) {
+				setTimeout(this._waitData.bind(this, id, callback), this._options.sleep * 1000);
 			} else {
-				if (res.status != status.COMPLETE) {
-					setTimeout(this._waitData.bind(this, id, callback), this._options.sleep * 1000);
-				} else {
-					return callback(res);
-				}
+				return callback(res);
 			}
-		}.bind(this)
-	);
-}
+		}
+	}).bind(this));
+};
 
 /**
  * Получения результатов
@@ -65,49 +60,43 @@ Base.prototype._waitData = function(id, callback) {
  * @param {function} callback
  * @returns {Promise}
  */
-Base.prototype._get = function(params, callback) {
+Base.prototype._get = function (params, callback) {
 	if (typeof callback == 'function') {
-		return this._process(params,
-			function(res) {
-				callback(null, res)
-			},
-			function(err) {
-				callback(err);
-			}
-		);
+		return this._process(params, function (res) {
+			callback(null, res);
+		}, function (err) {
+			callback(err);
+		});
 	} else {
-		return new Promise(function(resolve, reject) {
-			this._process(params,
-				function(res) {
-					resolve(res);
-				},
-				function(err) {
-					reject(err);
-				}
-			);
-		}.bind(this));
+		return new Promise((function (resolve, reject) {
+			this._process(params, function (res) {
+				resolve(res);
+			}, function (err) {
+				reject(err);
+			});
+		}).bind(this));
 	}
-}
+};
 
 /**
  * Выполняем запрос к сервису
  */
-Base.prototype._request = function(url, method, data, callback) {
+Base.prototype._request = function (url, method, data, callback) {
 	method = method || 'GET';
 
 	// формируем параметры запроса
 	let req = restler.request(url, {
 		method: method,
-		data: {data: JSON.stringify(data)},
+		data: { data: JSON.stringify(data) }
 	});
 
 	if (typeof callback == 'function') {
-		req.on('complete', function(res) {
+		req.on('complete', function (res) {
 			return callback(JSON.parse(res));
 		});
 	} else {
-		return new Promise(function(resolve, reject) {
-			req.on('complete', function(res) {
+		return new Promise(function (resolve, reject) {
+			req.on('complete', function (res) {
 				if (res instanceof Error) {
 					reject(res.message);
 				} else {
@@ -116,7 +105,7 @@ Base.prototype._request = function(url, method, data, callback) {
 			});
 		});
 	}
-}
+};
 
 /**
  * Формируем url запроса
@@ -126,13 +115,13 @@ Base.prototype._request = function(url, method, data, callback) {
  * @returns {*}
  * @private
  */
-Base.prototype._url = function(location, replacement, data) {
+Base.prototype._url = function (location, replacement, data) {
 	replacement = replacement || {};
 	data = data || {};
 
 	let url = this._options.host + interpolate(location, replacement);
 
 	return url += encode(merge(this._options.auth, data));
-}
+};
 
-module.exports  = Base;
+module.exports = Base;

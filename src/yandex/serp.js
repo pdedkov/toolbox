@@ -14,8 +14,8 @@ let merge = require('mout/object/merge');
 function Serp(options) {
 	this._defaults = {
 		location: {
-			set: {url: "yandex/serp.json"},
-			get: {url: "yandex/serp/{{id}}.json"}
+			set: { url: "yandex/serp.json" },
+			get: { url: "yandex/serp/{{id}}.json" }
 		},
 		sleep: 3
 	};
@@ -33,25 +33,20 @@ Serp.prototype.constructor = Serp;
  * @param {function} action действие
  * @private
  */
-Serp.prototype._process = function(host, success, error) {
+Serp.prototype._process = function (host, success, error) {
 	// сначала ставим задачку
-	this._request(
-		this._url(this._options.location.set.url),
-		'POST',
-		{url: host, domain: host},
-		function(id) {
-			if (id instanceof Error) {
-				error(id);
+	this._request(this._url(this._options.location.set.url), 'POST', { url: host, domain: host }, (function (id) {
+		if (id instanceof Error) {
+			error(id);
+		}
+		this._waitData.call(this, id.id, function (res) {
+			if (res instanceof Error) {
+				error(res);
 			}
-			this._waitData.call(this, id.id, function(res) {
-				if (res instanceof Error) {
-					error(res);
-				}
-				success(res.Result.pages);
-			});
-		}.bind(this)
-	);
-}
+			success(res.Result.pages);
+		});
+	}).bind(this));
+};
 
 /**
  * Получения результатов
@@ -59,8 +54,8 @@ Serp.prototype._process = function(host, success, error) {
  * @param {function} callback
  * @returns {Promise}
  */
-Serp.prototype.get = function(host, callback) {
+Serp.prototype.get = function (host, callback) {
 	return this._get(host, callback);
-}
+};
 
-module.exports  = Serp;
+module.exports = Serp;
