@@ -35,7 +35,7 @@ Serp.prototype.constructor = Serp;
  */
 Serp.prototype._process = function (host, success, error) {
 	// сначала ставим задачку
-	this._request(this._url(this._options.location.set.url), 'POST', { url: host, domain: host }, (function (id) {
+	this._request(this._url(this._options.location.set.url), 'POST', { url: host, domain: host }, function (id) {
 		if (id instanceof Error) {
 			error(id);
 		}
@@ -45,7 +45,7 @@ Serp.prototype._process = function (host, success, error) {
 			}
 			success(res.Result.pages);
 		});
-	}).bind(this));
+	}.bind(this));
 };
 
 /**

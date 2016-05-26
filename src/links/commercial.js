@@ -4,16 +4,16 @@ let Base = require('./../base');
 let merge = require('mout/object/merge');
 
 /**
- * Яндекс ТИЦ
+ * Определить коммерческих ссылок через tb
  *
  * @constructor
  * @param {Array} options массив параметров
  *
  */
-function Tcy(options) {
+function Commercial(options) {
 	this._defaults = {
 		location: {
-			get: { url: "yandex/tcy/{{host}}.json" }
+			get: { url: "links/commercial/{{anchor}}.json" }
 		}
 	};
 	// родительский конструктор
@@ -21,8 +21,8 @@ function Tcy(options) {
 }
 
 // Наследуемся
-Tcy.prototype = Object.create(Base.prototype);
-Tcy.prototype.constructor = Tcy;
+Commercial.prototype = Object.create(Base.prototype);
+Commercial.prototype.constructor = Commercial;
 
 /**
  * Постановка задачи и её обработка
@@ -30,18 +30,18 @@ Tcy.prototype.constructor = Tcy;
  * @param {function} action действие
  * @private
  */
-Tcy.prototype._process = function (host, success, error) {
+Commercial.prototype._process = function (anchor, success, error) {
 	// сначала ставим задачку
-	this._request(this._url(this._options.location.get.url, { host: host }), 'GET', {}, function (res) {
+	this._request(this._url(this._options.location.get.url, { anchor: encodeURIComponent(anchor) }), 'GET', {}, function (res) {
 		if (res instanceof Error) {
 			error(res);
 		}
-		success(res.tcy);
+		success(res.Result);
 	}.bind(this));
 };
 
-Tcy.prototype.get = function (host, callback) {
-	return this._get(host, callback);
+Commercial.prototype.get = function (anchor, callback) {
+	return this._get(anchor, callback);
 };
 
-module.exports = Tcy;
+module.exports = Commercial;

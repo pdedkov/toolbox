@@ -41,7 +41,7 @@ Base.prototype._process = function () {
  * @private
  */
 Base.prototype._waitData = function (id, callback) {
-	this._request(this._url(this._options.location.get.url, { id: id }), 'GET', {}, (function (res) {
+	this._request(this._url(this._options.location.get.url, { id: id }), 'GET', {}, function (res) {
 		if (res.status == status.ERROR) {
 			return callback(new Error(res.message));
 		} else {
@@ -51,7 +51,7 @@ Base.prototype._waitData = function (id, callback) {
 				return callback(res);
 			}
 		}
-	}).bind(this));
+	}.bind(this));
 };
 
 /**
@@ -68,13 +68,13 @@ Base.prototype._get = function (params, callback) {
 			callback(err);
 		});
 	} else {
-		return new Promise((function (resolve, reject) {
+		return new Promise(function (resolve, reject) {
 			this._process(params, function (res) {
 				resolve(res);
 			}, function (err) {
 				reject(err);
 			});
-		}).bind(this));
+		}.bind(this));
 	}
 };
 
@@ -91,13 +91,17 @@ Base.prototype._request = function (url, method, data, callback) {
 	});
 
 	if (typeof callback == 'function') {
-		req.on('complete', function (res) {
-			return callback(JSON.parse(res));
+		req.on('complete', function (data, res) {
+			if (data instanceof Error || res.statusCode != 200) {
+				return callback(data);
+			}
+
+			return callback(JSON.parse(data));
 		});
 	} else {
 		return new Promise(function (resolve, reject) {
-			req.on('complete', function (res) {
-				if (res instanceof Error) {
+			req.on('complete', function (data, res) {
+				if (data instanceof Error || res.statusCode != 200) {
 					reject(res.message);
 				} else {
 					resolve(JSON.parse(res));
@@ -120,8 +124,9 @@ Base.prototype._url = function (location, replacement, data) {
 	data = data || {};
 
 	let url = this._options.host + interpolate(location, replacement);
+	url += encode(merge(this._options.auth, data));
 
-	return url += encode(merge(this._options.auth, data));
+	return url;
 };
 
 module.exports = Base;
